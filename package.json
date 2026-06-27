@@ -7,7 +7,7 @@
   "scripts": {
     "type-check:watch": "tsc --noEmit --watch --preserveWatchOutput",
     "bundle:watch": "esbuild src/index.ts --bundle --outfile=dist/index.js --platform=node --format=esm --watch",
-    "dev": "concurrently -n \"TS,ESBuild\" -c \"cyan,magenta\" \"npm:type-check:watch\" \"npm:bundle:watch\"",
+    "dev": "concurrently -n \"TS,ESBuild,HTTPServer\" -c \"cyan,magenta\" \"npm:type-check:watch\" \"npm:bundle:watch\" \"npx http-server -p 8080\"",
     "type-check": "tsc --noEmit",
     "build:only": "esbuild src/index.ts --bundle --minify --outfile=dist/index.js --platform=node --format=esm",
     "build": "npm run type-check && npm run build:only"
@@ -19,6 +19,7 @@
     "@types/node": "^26.0.0",
     "concurrently": "^10.0.3",
     "esbuild": "^0.28.1",
+    "http-server": "^14.1.1",
     "tsx": "^4.22.4",
     "typescript": "^6.0.3"
   }
