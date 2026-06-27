@@ -33,7 +33,7 @@ class EventManager {
         this.initBuffer();
     }
 
-    register (handler: EventHandler) {
+    register(handler: EventHandler) {
         this.handlers.add(handler);
     }
 
@@ -77,3 +77,5 @@ class EventManager {
         }
     }
 }
+
+export { EventManager, type EventInput, type EventHandler };
