@@ -8,12 +8,12 @@ class Camera3D {
     viewportWidth: number;
     viewportHeight: number;
     
-    constructor(height: number, width: number) {
+    constructor(width: number, height: number) {
         this.pos = {x: 0, y: 0, z: 0};
         this.rotation = {pitch: 0, yaw: 0, roll: 0};
         this.fov = Math.PI / 2;
-        this.viewportHeight = height;
         this.viewportWidth = width;
+        this.viewportHeight = height;
     }
 
     setFov(fov: Degrees) {

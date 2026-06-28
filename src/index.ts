@@ -18,9 +18,9 @@ assertNonNull(ctx);
 
 const objectmanager = new ObjectManager();
 const eventmanager = new EventManager();
-const camera = new Camera3D(canvas.height, canvas.width);
+const camera = new Camera3D(WIDTH, HEIGHT);
 const pipeline = new Pipeline();
-const renderer = new Renderer(canvas.height, canvas.width);
+const renderer = new Renderer(WIDTH, HEIGHT);
 
 eventmanager.hookToBrowser({canvas: canvas});
 
