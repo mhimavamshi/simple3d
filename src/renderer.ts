@@ -1,4 +1,5 @@
 import { type RenderData } from "./geometry";    
+import { assertNonNull } from "./utils";
 
 class FrameBuffer {
     width: number;
@@ -44,13 +45,37 @@ class FrameBuffer {
 
 class Renderer {
     buffer: FrameBuffer;
+    // zbuffer lets make a z buffer class    
 
     constructor(width: number, height: number) {
         this.buffer = new FrameBuffer(width, height);
     }
 
+    // edge functions here!
+    rasterizeTriangle(data: RenderData) {
+        for(const [index, triangle] of data.triangles.entries()) {
+            const a = data.vertices[triangle.a];
+            const b = data.vertices[triangle.b];
+            const c = data.vertices[triangle.c];
+            assertNonNull(a);
+            assertNonNull(b);
+            assertNonNull(c);       
+            
+            // now we have triangles :P 
+            // edge function to rasterize
+            // and z value buffer, for draw or not
+            //....after dinner
+        }
+    }
+
+
+
     render(data: Array<RenderData>): Uint8ClampedArray {
-        return new Uint8ClampedArray();
+        this.buffer.clear();
+        for(const unit of data) {
+            this.rasterizeTriangle(unit);
+        }
+        return this.buffer.flatten();
     }
 }
 
