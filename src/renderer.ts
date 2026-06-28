@@ -1,4 +1,4 @@
-import { RenderData } from "./geometry";    
+import { type RenderData } from "./geometry";    
 
 class FrameBuffer {
     width: number;
@@ -49,8 +49,8 @@ class Renderer {
         this.buffer = new FrameBuffer(width, height);
     }
 
-    render(): Uint8ClampedArray {
-
+    render(data: Array<RenderData>): Uint8ClampedArray {
+        return new Uint8ClampedArray();
     }
 }
 
