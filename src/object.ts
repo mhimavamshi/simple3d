@@ -1,4 +1,5 @@
 import type { Point3d, Mesh } from "./geometry";
+import { assertNonNull } from "./utils";
     
 class SObject {
     pos: Point3d;
@@ -49,11 +50,16 @@ class ObjectManager {
 
     apply(name: string, transform: ObjectTransform) {
         let object = this.objects.get(name);
-        if(object === undefined) {
-            return;
-        }
+        assertNonNull(object);
         transform(object);
     }
+
+    *[Symbol.iterator]() {
+        for (const object of this.objects.values()) {
+            yield object;
+        }
+    }
+
 }
 
 export { ObjectManager, SObject }
