@@ -1,5 +1,5 @@
 import { Camera3D } from "./camera"
-import type { Mesh, Point2d, RenderData, RenderVertex } from "./geometry"
+import type { Mesh, Point2d, RenderData, RenderVertex, Triangle } from "./geometry"
 import { add3D, subtract3D } from "./mathutils"
 import type { ObjectManager, SObject } from "./object"
 import { projectAllTo2d } from "./projection"
@@ -45,6 +45,7 @@ class Pipeline {
     clip(meshes: Array<Mesh>): Array<Mesh> {
         const clippedMeshes: Array<Mesh> = [];
         for(const mesh of meshes) {
+            const clippedTriangles: Array<Triangle> = [];
             // iterate over triangles, remove any if one of the vertice has z <= 0
             for(const triangle of mesh.triangles) {
                 const a = mesh.vertices[triangle.a];
@@ -60,7 +61,12 @@ class Pipeline {
                 ) {
                     continue;
                 }
+                clippedTriangles.push(triangle);
             }
+            clippedMeshes.push({
+                triangles: clippedTriangles,
+                vertices: mesh.vertices
+            })
         }
         return clippedMeshes;
     }
