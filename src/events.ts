@@ -1,3 +1,5 @@
+import { assertNonNull } from "./utils";
+
 enum EventType {
     KEYDOWN = "keydown",
     KEYUP = "keyup",
@@ -39,9 +41,7 @@ class EventManager {
 
     emit(event: SEvent) {
         let buff = this.buffer.get(event.type);
-        if(buff === undefined) {
-            return;
-        }
+        assertNonNull(buff);
         buff.push(event);
     }
 
