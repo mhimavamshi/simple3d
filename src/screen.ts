@@ -1,4 +1,4 @@
-type loopCallback = (ctx: CanvasRenderingContext2D, delta: number) => void;
+type loopCallback = (delta: number) => void;
 
 class Screen {
     canvas: HTMLCanvasElement;
@@ -29,15 +29,16 @@ class Screen {
     }
 
     renderLoop = (currentTime: number) => {
-        this.clearScreen();
         if (!this.lastTime) {
+            this.clearScreen();
             this.lastTime = currentTime;
             requestAnimationFrame(this.renderLoop);
             return; 
         }
+        this.clearScreen();
         const delta = currentTime - this.lastTime;
         this.lastTime = currentTime; 
-        this.loop(this.ctx, delta);
+        this.loop(delta);
         requestAnimationFrame(this.renderLoop);
     }
 
