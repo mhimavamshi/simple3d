@@ -18,5 +18,25 @@ interface Mesh {
     triangles: Array<Triangle>
 }
 
+type Radians = number;
+type Degrees = number;
 
-export type { Point2d, Point3d, Triangle, Mesh };
+interface Rotation {
+    pitch: Radians,
+    yaw: Radians,
+    roll: Radians
+}
+
+interface RenderVertex {
+    screenX: number,
+    screenY: number,
+    depth: number
+}
+
+interface RenderData {
+    vertices: Array<RenderVertex>, 
+    triangles: Array<Triangle>
+}
+
+
+export type { Point2d, Point3d, Triangle, Mesh, Radians, Degrees, Rotation, RenderVertex, RenderData };
