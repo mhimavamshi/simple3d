@@ -63,7 +63,6 @@ class Pipeline {
                 }
                 clippedTriangles.push(triangle);
             }
-            if(clippedTriangles.length )
             clippedMeshes.push({
                 triangles: clippedTriangles,
                 vertices: mesh.vertices
