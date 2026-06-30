@@ -1,4 +1,4 @@
-import type { Degrees, Point3d, Radians } from "./geometry";  
+import type { Degrees, Point2d, Point3d, Radians, RenderVertex } from "./geometry";  
 
 function degreesToRadians(degrees: Degrees): Radians {
     return degrees * (Math.PI / 180);
@@ -20,4 +20,12 @@ function subtract3D(a: Point3d, b: Point3d): Point3d {
     }
 }
  
-export { degreesToRadians, add3D, subtract3D };
+function subtractVertex(a: RenderVertex, b: RenderVertex): Point2d {
+    return {
+        x: a.screenX - b.screenX,
+        y: a.screenY - b.screenY,
+    }
+}
+ 
+
+export { degreesToRadians, add3D, subtract3D, subtractVertex };
