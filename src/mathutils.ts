@@ -20,6 +20,13 @@ function subtract3D(a: Point3d, b: Point3d): Point3d {
     }
 }
  
+function subtract2D(a: Point2d, b: Point2d): Point2d {
+    return {
+        x: a.x - b.x,
+        y: a.y - b.y,
+    }
+}
+ 
 function subtractVertex(a: RenderVertex, b: RenderVertex): Point2d {
     return {
         x: a.screenX - b.screenX,
@@ -28,4 +35,4 @@ function subtractVertex(a: RenderVertex, b: RenderVertex): Point2d {
 }
  
 
-export { degreesToRadians, add3D, subtract3D, subtractVertex };
+export { degreesToRadians, add3D, subtract3D, subtract2D, subtractVertex };
