@@ -6,6 +6,8 @@ import { Renderer } from "./renderer";
 import { Camera3D } from "./camera";    
 import { EventManager, type EventInput, type EventHandler } from "./events";    
 import { assertNonNull } from "./utils";
+import type { Mesh } from "./geometry";
+import { loadOBJ } from "./fileformats";
 
 
 const canvas = document.querySelector<HTMLCanvasElement>("#worldCanvas");
@@ -43,17 +45,53 @@ const echoevents = new EchoHandler();
 
 eventmanager.register(echoevents);
 
-// const cube = new SObject({x: 10, y: 10, z: 30}, {vertices: [{x: 1, y: 1, z: 100}], triangles: [{a: 0, b: 0, c: 0}]}); // its wrong but you get the point
-// objectmanager.add("cube", cube);
+const objText = await fetch("teddy.obj").then(r => r.text());
 
-function loop(delta: number) {
+const mesh = loadOBJ(objText);
+for (const v of mesh.vertices) {
+    v.x *= 100;
+    v.y *= 100;
+    v.z *= 2;
+}
+
+objectmanager.add(
+    "obj",
+    new SObject({ x: 0, y: 0, z: 2 }, mesh)
+);
+
+// objectmanager.add(
+//     "obj2",
+//     new SObject({ x: 100, y: 500, z: 2 }, mesh)
+// );
+
+// objectmanager.add(
+//     "obj3",
+//     new SObject({ x: 500, y: 500, z: 3 }, mesh)
+// );
+
+// objectmanager.add(
+//     "obj4",
+//     new SObject({ x: 700, y: 0, z: 4 }, mesh)
+// );
+
+camera.pos = {
+    x: 0,
+    y: 0,
+    z: 0,
+};
+
+const imagedata = new ImageData(WIDTH, HEIGHT);
+
+function display(ctx: CanvasRenderingContext2D, pixels: Uint8ClampedArray<ArrayBuffer>) {
+    imagedata.data.set(pixels);
+    ctx.putImageData(imagedata, 0, 0);
+}
+
+function loop(ctx: CanvasRenderingContext2D, delta: number) {
     eventmanager.dispatch();
-    // any physics updates handling the objects, that might use delta
-    // for now just object transforms
-    // objectmanager.applyToAll(ObjectTransforms.rotate);
     let renderdata = pipeline.in(objectmanager, camera);
-    const imagedata = renderer.render(renderdata);
-    // function that puts image data on the screen
+    const pixels = renderer.render(renderdata) as Uint8ClampedArray<ArrayBuffer>;
+    display(ctx, pixels);
 }   
 
 const screen = new Screen(canvas, ctx);
