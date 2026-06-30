@@ -1,6 +1,6 @@
 import { type Point2d, type RenderData } from "./geometry";    
-import { subtract2D, subtract3D, subtractVertex } from "./mathutils";
-import { assertNonNull } from "./utils";
+import { subtract2D, subtractVertex } from "./mathutils";
+import { assertNonNull, renderVertexTo2d } from "./utils";
 
 class FrameBuffer {
     width: number;
@@ -11,7 +11,7 @@ class FrameBuffer {
     constructor(width: number, height: number, ) {
         this.width = width;
         this.height = height;
-        this.DEFAULT_COLOR = "black";
+        this.DEFAULT_COLOR = "#000000";
         this.buffer = Array(this.width * this.height).fill(this.DEFAULT_COLOR);
     }
 
@@ -29,16 +29,32 @@ class FrameBuffer {
     }
 
     set(x: number, y: number, color: string) {
-        const ix = x + this.width/2;
-        const iy = this.height/2 - y;
+        const ix = Math.round(x + this.width / 2);
+        const iy = Math.round(this.height / 2 - y);
         if(this.inBounds(ix, iy)) {   
             this.buffer[iy * this.width + ix] = color;
         }
     }
 
-    // will implement [R, G, B, A ...] expansion here
     flatten(): Uint8ClampedArray {
-        return new Uint8ClampedArray();
+        const data = new Uint8ClampedArray(this.width * this.height * 4);
+
+        for (let i = 0; i < this.buffer.length; i++) {
+            const color = this.buffer[i];
+            assertNonNull(color);
+
+            const r = parseInt(color.slice(1, 3), 16);
+            const g = parseInt(color.slice(3, 5), 16);
+            const b = parseInt(color.slice(5, 7), 16);
+
+            const offset = i * 4;
+            data[offset] = r;
+            data[offset + 1] = g;
+            data[offset + 2] = b;
+            data[offset + 3] = 255;
+        }
+
+        return data;
     }
 
 }
@@ -111,12 +127,20 @@ class Renderer {
         this.zbuffer = new ZBuffer(width, height);
     }
 
-    edgeFunction(a: Point2d, b: Point2d): number {
+    crossProduct(a: Point2d, b: Point2d): number {
         return (a.x*b.y) - (a.y*b.x);
     }
 
+    edgeFunction(edge: Point2d, start: Point2d, point: Point2d): number {
+        const v = subtract2D(point, start);
+        return this.crossProduct(edge, v);
+    }
+
     inTriangle(e0: number, e1: number, e2: number): boolean {
-        return e0 > 0 && e1 > 0 && e2 > 0;
+        const hasNeg = e0 < 0 || e1 < 0 || e2 < 0;
+        const hasPos = e0 > 0 || e1 > 0 || e2 > 0;
+
+        return !(hasNeg && hasPos);
     }
 
     // edge functions here!
@@ -129,11 +153,18 @@ class Renderer {
             assertNonNull(b);
             assertNonNull(c);       
             
-            const ab = subtractVertex(a, b);
-            const bc = subtractVertex(b, c);
-            const ca = subtractVertex(c, a);
-            const areaABC = this.edgeFunction(ab, {x: c.screenX, y: screenY});
+            const ab = subtractVertex(b, a);
+            const bc = subtractVertex(c, b);
+            const ca = subtractVertex(a, c);
 
+            const vec_a = renderVertexTo2d(a);
+            const vec_b = renderVertexTo2d(b);
+            const vec_c = renderVertexTo2d(c);
+
+            const areaABC = this.edgeFunction(ab, vec_a, vec_c);
+            if (areaABC === 0) {
+               continue;
+            }
             // now we have triangles :P 
             // edge function to rasterize
             // and z value buffer, for draw or not
@@ -151,9 +182,11 @@ class Renderer {
             for(let y = minY; y <= maxY; y++) {
                 for(let x = minX; x <= maxX; x++) {
                     // check with edge function for all 3 edges
-                    const e0 = this.edgeFunction(bc, {x: x, y: y});
-                    const e1 = this.edgeFunction(ca, {x: x, y: y});
-                    const e2 = this.edgeFunction(ab, {x: x, y: y});
+                    const p: Point2d = { x, y };           
+
+                    const e0 = this.edgeFunction(bc, vec_b, p);
+                    const e1 = this.edgeFunction(ca, vec_c, p);
+                    const e2 = this.edgeFunction(ab, vec_a, p);
 
                     // check if the signs are all positive            
                     if(this.inTriangle(e0, e1, e2)) {
@@ -167,7 +200,7 @@ class Renderer {
                         // test and set it in z buffer
                         if(this.zbuffer.testAndSet(x, y, depth)) {
                             // if yes, draw the point in framebuffer
-                            this.buffer.set(x, y, "white");
+                            this.buffer.set(x, y, "#ffffff");
                         }
                                 
                     }
@@ -184,7 +217,6 @@ class Renderer {
 
 
     render(data: Array<RenderData>): Uint8ClampedArray {
-        this.buffer.clear();
         for(const unit of data) {
             this.rasterizeTriangles(unit);
         }
