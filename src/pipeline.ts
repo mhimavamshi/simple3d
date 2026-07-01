@@ -43,6 +43,7 @@ class Pipeline {
 
     // clip meshes by culling. culling by z <= 0. later: back face. near-plane and far-plane  
     clip(meshes: Array<Mesh>): Array<Mesh> {
+        const NEAR = 0.1;
         const clippedMeshes: Array<Mesh> = [];
         for(const mesh of meshes) {
             const clippedTriangles: Array<Triangle> = [];
@@ -55,9 +56,9 @@ class Pipeline {
                 assertNonNull(b);
                 assertNonNull(c);
                 if(
-                    a.z <= 0 || 
-                    b.z <= 0 ||
-                    c.z <= 0
+                    a.z <= NEAR || 
+                    b.z <= NEAR ||
+                    c.z <= NEAR
                 ) {
                     continue;
                 }
