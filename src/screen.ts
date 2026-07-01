@@ -36,7 +36,7 @@ class Screen {
             return; 
         }
         this.clearScreen();
-        const delta = currentTime - this.lastTime;
+        const delta = (currentTime - this.lastTime) / 1000;
         this.lastTime = currentTime; 
         this.loop(this.ctx, delta);
         requestAnimationFrame(this.renderLoop);
