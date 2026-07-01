@@ -1,7 +1,7 @@
 import { Screen } from "./screen";
 import { Pipeline } from "./pipeline";
 import { SObject, ObjectManager } from "./object";   
-import { ObjectTransforms } from "./objectTransforms";  
+import * as ObjectTransforms from "./objectTransforms" ;  
 import { Renderer } from "./renderer";  
 import { Camera3D } from "./camera";    
 import { EventManager, type EventInput, type EventHandler } from "./events";    
@@ -45,18 +45,29 @@ const echoevents = new EchoHandler();
 
 eventmanager.register(echoevents);
 
-const objText = await fetch("teddy.obj").then(r => r.text());
+// const objText = await fetch("cow-nonormals.obj").then(r => r.text());
 
-const mesh = loadOBJ(objText);
-for (const v of mesh.vertices) {
-    v.x *= 100;
-    v.y *= 100;
-    v.z *= 2;
-}
+// const mesh = loadOBJ(objText);
+// for (const v of mesh.vertices) {
+//     v.x *= 50;
+//     v.y *= 50;
+//     // v.z *= 2;
+// }
+
+const triangle: Mesh = {
+    vertices: [
+        { x: 100, y: 100, z: 0 },
+        { x: 180, y: 100, z: 0 },
+        { x: 100, y: 180, z: 0 },
+    ],
+    triangles: [
+        { a: 0, b: 1, c: 2 },
+    ],
+};
 
 objectmanager.add(
-    "obj",
-    new SObject({ x: 0, y: 0, z: 2 }, mesh)
+    "triangle",
+    new SObject({ x: 0, y: 0, z: 10 }, triangle)
 );
 
 // objectmanager.add(
@@ -87,8 +98,11 @@ function display(ctx: CanvasRenderingContext2D, pixels: Uint8ClampedArray<ArrayB
     ctx.putImageData(imagedata, 0, 0);
 }
 
+const angularSpeed = Math.PI / 8; // 5.625°/s
+
 function loop(ctx: CanvasRenderingContext2D, delta: number) {
     eventmanager.dispatch();
+    objectmanager.applyToAll(ObjectTransforms.rotateX, {delta, angularSpeed}); 
     let renderdata = pipeline.in(objectmanager, camera);
     const pixels = renderer.render(renderdata) as Uint8ClampedArray<ArrayBuffer>;
     display(ctx, pixels);
