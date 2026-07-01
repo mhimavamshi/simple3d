@@ -45,20 +45,15 @@ const echoevents = new EchoHandler();
 
 eventmanager.register(echoevents);
 
-// const objText = await fetch("cow-nonormals.obj").then(r => r.text());
+const objText = await fetch("teapot.obj").then(r => r.text());
 
-// const mesh = loadOBJ(objText);
-// for (const v of mesh.vertices) {
-//     v.x *= 50;
-//     v.y *= 50;
-//     // v.z *= 2;
-// }
+const mesh = loadOBJ(objText);
 
 const triangle: Mesh = {
     vertices: [
-        { x: 100, y: 100, z: 0 },
-        { x: 180, y: 100, z: 0 },
-        { x: 100, y: 180, z: 0 },
+        { x: 100, y: 100, z: 3 },
+        { x: 180, y: 100, z: 3 },
+        { x: 100, y: 180, z: 3 },
     ],
     triangles: [
         { a: 0, b: 1, c: 2 },
@@ -66,8 +61,8 @@ const triangle: Mesh = {
 };
 
 objectmanager.add(
-    "triangle",
-    new SObject({ x: 0, y: 0, z: 10 }, triangle)
+    "cow",
+    new SObject({ x: 0, y: 0, z: 50 }, mesh)
 );
 
 // objectmanager.add(
@@ -98,11 +93,12 @@ function display(ctx: CanvasRenderingContext2D, pixels: Uint8ClampedArray<ArrayB
     ctx.putImageData(imagedata, 0, 0);
 }
 
-const angularSpeed = Math.PI / 8; // 5.625°/s
+const angularSpeed = Math.PI / 6; // 5.625°/s
 
 function loop(ctx: CanvasRenderingContext2D, delta: number) {
     eventmanager.dispatch();
     objectmanager.applyToAll(ObjectTransforms.rotateX, {delta, angularSpeed}); 
+    objectmanager.applyToAll(ObjectTransforms.rotateZ, {delta, angularSpeed}); 
     let renderdata = pipeline.in(objectmanager, camera);
     const pixels = renderer.render(renderdata) as Uint8ClampedArray<ArrayBuffer>;
     display(ctx, pixels);
