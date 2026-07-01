@@ -4,16 +4,36 @@ import { assertNonNull } from "./utils";
 class SObject {
     pos: Point3d;
     mesh: Mesh;
+    pivot: Point3d;
 
     constructor(pos: Point3d, mesh: Mesh) {
         this.pos = pos;
         this.mesh = mesh;
+        this.pivot = this.computeCenter(mesh);
+    }
+
+    computeCenter(mesh: Mesh): Point3d {
+        let x = 0, y = 0, z = 0;
+
+        for (const v of mesh.vertices) {
+            x += v.x;
+            y += v.y;
+            z += v.z;
+        }
+
+        const n = mesh.vertices.length;
+
+        return {
+            x: x / n,
+            y: y / n,
+            z: z / n,
+        };
     }
 
 }
 
 // function of ObjectTransforms
-type ObjectTransform = (object: SObject) => void;
+type ObjectTransform<TContext> = (object: SObject, ctx: TContext) => void;
 
 // handles named objects
 // you can get all objects in the world
@@ -42,16 +62,16 @@ class ObjectManager {
         return this.objects.size;
     }
 
-    applyToAll(transform: ObjectTransform) {
+    applyToAll<TContext>(transform: ObjectTransform<TContext>, ctx: TContext) {
         for (const [name, object] of this.objects) {
-            transform(object);
+            transform(object, ctx);
         }
     }
 
-    apply(name: string, transform: ObjectTransform) {
+    apply<TContext>(name: string, transform: ObjectTransform<TContext>, ctx: TContext) {
         let object = this.objects.get(name);
         assertNonNull(object);
-        transform(object);
+        transform(object, ctx);
     }
 
     *[Symbol.iterator]() {
