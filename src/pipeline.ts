@@ -73,11 +73,9 @@ class Pipeline {
     }
 
     useFov(points: Array<Point2d>, camera: Camera3D) {
-        const focalLength = (camera.viewportHeight / 2) / Math.tan(camera.fov/2);
-        const aspect = camera.viewportWidth / camera.viewportHeight;
         for(const point of points) {
-            point.x *= focalLength * aspect;
-            point.y *= focalLength;
+            point.x *= camera.focalLength * camera.aspect;
+            point.y *= camera.focalLength;
         }
     } 
 
@@ -87,7 +85,7 @@ class Pipeline {
         for(const mesh of meshes) {
             let projectedPoints: Array<Point2d> = projectAllTo2d(mesh.vertices);
             // handle fov and stuff later
-            // useFov(projectedPoints, camera)
+            this.useFov(projectedPoints, camera);
             const renderVertices: Array<RenderVertex> = []; 
             for(const [i, point] of projectedPoints.entries()) {   
                 assertNonNull(mesh.vertices[i]);
